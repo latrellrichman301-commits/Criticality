@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Criticality: Online Multiplayer</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; cursor: pointer; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; touch-action: none; }
+        #instructions { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; pointer-events: none; text-shadow: 0px 2px 4px rgba(0,0,0,0.6); z-index: 10; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        h1 { font-size: 24px; letter-spacing: 3px; margin: 0 0 10px 0; text-transform: uppercase; }
+        p { margin: 5px 0; font-size: 14px; opacity: 0.9; }
+        #crosshair { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; border: 2px solid rgba(255,255,255,0.9); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; display: none; z-index: 20; box-shadow: 0 0 4px rgba(0,0,0,0.5); }
+        #status { position: absolute; top: 10px; left: 10px; color: rgba(255,255,255,0.5); font-size: 12px; pointer-events: none; font-family: monospace; }
+        .mobile-controls { display: none; position: absolute; bottom: 30px; width: 100%; justify-content: space-between; padding: 0 30px; box-sizing: border-box; pointer-events: none; z-index: 100; user-select: none; -webkit-user-select: none; }
+        @media (pointer: coarse) { .mobile-controls { display: flex; } }
+        .joystick-zone { width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; position: relative; pointer-events: auto; border: 2px solid rgba(255,255,255,0.2); }
+        .joystick-knob { width: 50px; height: 50px; background: rgba(255,255,255,0.5); border-radius: 50%; position: absolute; top: 35px; left: 35px; pointer-events: none; }
+        .button-stack { display: flex; flex-direction: column; gap: 15px; pointer-events: auto; }
+        .mobile-btn { width: 70px; height: 70px; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.6); border-radius: 50%; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .mobile-btn:active { background: rgba(255,255,255,0.4); }
+    </style>
+</head>
+<body>
+
+    <div id="instructions">
+        <h1>Criticality Online</h1>
+        <p>CLICK/TAP TO START</p>
+        <p><strong>WASD</strong> Move • <strong>SPACE</strong> Jump • <strong>SHIFT</strong> Shift Lock</p>
+    </div>
+
+    <div id="crosshair"></div>
+    <div id="status">Status: Connecting...</div>
+
+    <div class="mobile-controls">
+        <div class="joystick-zone" id="joyZone">
+            <div class="joystick-knob" id="joyKnob"></div>
+        </div>
+        <div class="button-stack">
+            <div class="mobile-btn" id="mbShift">SHIFT</div>
+            <div class="mobile-btn" id="mbJump">JUMP</div>
+        </div>
+    </div>
+
+    <script>
+        // --- MULTIPLAYER SETUP ---
+        const socket = io('http://localhost:3000'); // CHANGE THIS to your server URL when you host it
+        const statusEl = document.getElementById('status');
+        
+        socket.on('connect', () => { statusEl.innerText = "Status: Online"; });
+        socket.on('disconnect', () => { statusEl.innerText = "Status: Offline"; });
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xA3C1AD);
+        scene.fog = new THREE.Fog(0xA3C1AD, 40, 180);
+
+        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const sunLight = new THREE.DirectionalLight(0xffffff, 0.7);
+        sunLight.position.set(50, 100, 50);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.set(2048, 2048);
+        scene.add(sunLight);
+
+        // Textures
+        const canvas = document.createElement('canvas');
+        canvas.width = 128; canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#A3A2A5'; ctx.fillRect(0, 0, 128, 128);
+        ctx.fillStyle = '#929194'; ctx.beginPath(); ctx.arc(64, 64, 24, 0, Math.PI * 2); ctx.fill();
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(200, 200);
+
+        const plane = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshStandardMaterial({ map: texture, roughness: 0.9 }));
+        plane.rotation.x = -Math.PI / 2;
+        plane.receiveShadow = true;
+        scene.add(plane);
+
+        const faceCanvas = document.createElement('canvas');
+        faceCanvas.width = 256; faceCanvas.height = 256;
+        const fctx = faceCanvas.getContext('2d');
+        fctx.fillStyle = '#F5CD2F'; fctx.fillRect(0, 0, 256, 256);
+        fctx.fillStyle = '#111'; fctx.beginPath(); fctx.arc(85, 95, 18, 0, Math.PI * 2); fctx.fill();
+        fctx.beginPath(); fctx.arc(171, 95, 18, 0, Math.PI * 2); fctx.fill();
+        fctx.lineWidth = 14; fctx.lineCap = 'round'; fctx.beginPath(); fctx.arc(128, 115, 65, 0.15 * Math.PI, 0.85 * Math.PI); fctx.stroke();
+        const faceTexture = new THREE.CanvasTexture(faceCanvas);
+
+        const skinMat = new THREE.MeshStandardMaterial({ color: 0xF5CD2F }); 
+        const hoodieMat = new THREE.MeshStandardMaterial({ color: 0xAD1414 }); 
+        const pantsMat = new THREE.MeshStandardMaterial({ color: 0x1B1B1B });
+
+        function createNameTag(name) {
+            const nCanvas = document.createElement('canvas');
+            const nCtx = nCanvas.getContext('2d');
+            nCanvas.width = 512; nCanvas.height = 128;
+            nCtx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            nCtx.beginPath();
+            nCtx.roundRect(64, 20, 384, 88, 30);
+            nCtx.fill();
+            nCtx.font = 'bold 44px Arial';
+            nCtx.fillStyle = 'white';
+            nCtx.textAlign = 'center';
+            nCtx.fillText(name, 256, 82);
+            const nTexture = new THREE.CanvasTexture(nCanvas);
+            const spriteMat = new THREE.SpriteMaterial({ map: nTexture });
+            const sprite = new THREE.Sprite(spriteMat);
+            sprite.scale.set(5, 1.25, 1);
+            sprite.position.y = 7;
+            return sprite;
+        }
+
+        const myName = "Baboom_" + Math.floor(Math.random() * 999);
+
+        // LOCAL PLAYER
+        const player = new THREE.Group();
+        const upperBodyGroup = new THREE.Group();
+        upperBodyGroup.position.y = 2; 
+        player.add(upperBodyGroup);
+
+        const torso = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 1), hoodieMat);
+        torso.position.y = 1; torso.castShadow = true;
+        upperBodyGroup.add(torso);
+
+        const head = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 1.2), [skinMat, skinMat, skinMat, skinMat, new THREE.MeshStandardMaterial({ map: faceTexture }), skinMat]);
+        head.position.y = 2.6; head.castShadow = true;
+        upperBodyGroup.add(head);
+
+        const armLGroup = new THREE.Group(); armLGroup.position.set(-1.5, 2, 0);
+        const armL = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), hoodieMat); armL.position.y = -1; armL.castShadow = true;
+        armLGroup.add(armL); upperBodyGroup.add(armLGroup);
+
+        const armRGroup = new THREE.Group(); armRGroup.position.set(1.5, 2, 0);
+        const armR = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), hoodieMat); armR.position.y = -1; armR.castShadow = true;
+        armRGroup.add(armR); upperBodyGroup.add(armRGroup);
+
+        const legLGroup = new THREE.Group(); legLGroup.position.set(-0.5, 2, 0);
+        const legL = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), pantsMat); legL.position.y = -1; legL.castShadow = true;
+        legLGroup.add(legL); player.add(legLGroup);
+
+        const legRGroup = new THREE.Group(); legRGroup.position.set(0.5, 2, 0);
+        const legR = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), pantsMat); legR.position.y = -1; legR.castShadow = true;
+        legRGroup.add(legR); player.add(legRGroup);
+
+        scene.add(player);
+
+        // REMOTE PEERS
+        const peers = {};
+
+        function createRemoteBaboom(name) {
+            const pGroup = new THREE.Group();
+            const uGroup = new THREE.Group();
+            uGroup.position.y = 2;
+            pGroup.add(uGroup);
+            const rTorso = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 1), hoodieMat);
+            rTorso.position.y = 1; rTorso.castShadow = true;
+            uGroup.add(rTorso);
+            const rHead = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 1.2), [skinMat, skinMat, skinMat, skinMat, new THREE.MeshStandardMaterial({ map: faceTexture }), skinMat]);
+            rHead.position.y = 2.6; rHead.castShadow = true;
+            uGroup.add(rHead);
+            const rArmLGroup = new THREE.Group(); rArmLGroup.position.set(-1.5, 2, 0);
+            const rArmL = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), hoodieMat); rArmL.position.y = -1; rArmL.castShadow = true;
+            rArmLGroup.add(rArmL); uGroup.add(rArmLGroup);
+            const rArmRGroup = new THREE.Group(); rArmRGroup.position.set(1.5, 2, 0);
+            const rArmR = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), hoodieMat); rArmR.position.y = -1; rArmR.castShadow = true;
+            rArmRGroup.add(rArmR); uGroup.add(rArmRGroup);
+            const rLegLGroup = new THREE.Group(); rLegLGroup.position.set(-0.5, 2, 0);
+            const rLegL = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), pantsMat); rLegL.position.y = -1; rLegL.castShadow = true;
+            rLegLGroup.add(rLegL); pGroup.add(rLegLGroup);
+            const rLegRGroup = new THREE.Group(); rLegRGroup.position.set(0.5, 2, 0);
+            const rLegR = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), pantsMat); rLegR.position.y = -1; rLegR.castShadow = true;
+            rLegRGroup.add(rLegR); pGroup.add(rLegRGroup);
+            pGroup.add(createNameTag(name));
+            return { mesh: pGroup, uGroup, legL: rLegLGroup, legR: rLegRGroup, armL: rArmLGroup, armR: rArmRGroup, targetPos: new THREE.Vector3(), targetRot: 0, isMoving: false, walkTime: 0 };
+        }
+
+        // Handle incoming data from server
+        socket.on('playerMoved', (data) => {
+            if (!peers[data.id]) {
+                const newPeer = createRemoteBaboom(data.name);
+                scene.add(newPeer.mesh);
+                peers[data.id] = newPeer;
+            }
+            const p = peers[data.id];
+            p.targetPos.set(data.x, data.y, data.z);
+            p.targetRot = data.rot;
+            p.isMoving = data.moving;
+            p.lastUpdate = Date.now();
+        });
+
+        socket.on('playerDisconnected', (id) => {
+            if (peers[id]) {
+                scene.remove(peers[id].mesh);
+                delete peers[id];
+            }
+        });
+
+        // Controls
+        const keys = { w: false, a: false, s: false, d: false };
+        let velocityY = 0, isGrounded = true, camAngle = 0, camTilt = 0.4, walkTime = 0, shiftLock = false, jumpCounter = 0;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'KeyW') keys.w = true; if (e.code === 'KeyA') keys.a = true;
+            if (e.code === 'KeyS') keys.s = true; if (e.code === 'KeyD') keys.d = true;
+            if (e.code === 'Space' && isGrounded) { velocityY = 0.55; isGrounded = false; jumpCounter++; }
+            if (e.code.includes('Shift')) { shiftLock = !shiftLock; document.getElementById('crosshair').style.display = shiftLock ? 'block' : 'none'; }
+        });
+        document.addEventListener('keyup', (e) => {
+            if (e.code === 'KeyW') keys.w = false; if (e.code === 'KeyA') keys.a = false;
+            if (e.code === 'KeyS') keys.s = false; if (e.code === 'KeyD') keys.d = false;
+        });
+
+        window.addEventListener('mousedown', () => { if(!('ontouchstart' in window)) document.body.requestPointerLock(); });
+        document.addEventListener('pointerlockchange', () => { 
+            document.getElementById('instructions').style.display = document.pointerLockElement ? 'none' : 'block'; 
+            if(!document.pointerLockElement) keys.w = keys.a = keys.s = keys.d = false;
+        });
+        document.addEventListener('mousemove', (e) => { if (document.pointerLockElement) { camAngle -= e.movementX * 0.004; camTilt = Math.max(-0.6, Math.min(1.2, camTilt + e.movementY * 0.004)); } });
+
+        // Mobile Controls
+        const joyKnob = document.getElementById('joyKnob');
+        const joyZone = document.getElementById('joyZone');
+        let joyActive = false;
+
+        joyZone.addEventListener('pointerdown', (e) => { joyActive = true; document.getElementById('instructions').style.display = 'none'; });
+        window.addEventListener('pointermove', (e) => {
+            if (!joyActive) return;
+            const rect = joyZone.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const dx = e.clientX - centerX;
+            const dy = e.clientY - centerY;
+            const dist = Math.min(Math.sqrt(dx*dx + dy*dy), 45);
+            const angle = Math.atan2(dy, dx);
+            joyKnob.style.transform = `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px)`;
+            keys.w = dy < -20; keys.s = dy > 20; keys.a = dx < -20; keys.d = dx > 20;
+        });
+        window.addEventListener('pointerup', () => {
+            joyActive = false;
+            joyKnob.style.transform = `translate(0px, 0px)`;
+            keys.w = keys.a = keys.s = keys.d = false;
+        });
+
+        document.getElementById('mbJump').addEventListener('pointerdown', () => { if (isGrounded) { velocityY = 0.55; isGrounded = false; jumpCounter++; } });
+        document.getElementById('mbShift').addEventListener('pointerdown', () => { shiftLock = !shiftLock; document.getElementById('crosshair').style.display = shiftLock ? 'block' : 'none'; });
+
+        let lastTouchX = 0, lastTouchY = 0;
+        window.addEventListener('touchstart', e => { 
+            lastTouchX = e.touches[0].pageX; 
+            lastTouchY = e.touches[0].pageY;
+            document.getElementById('instructions').style.display = 'none';
+        });
+        window.addEventListener('touchmove', e => {
+            if (e.target.closest('#joyZone') || e.target.closest('.mobile-btn')) return;
+            const touch = e.touches[0];
+            camAngle -= (touch.pageX - lastTouchX) * 0.008;
+            camTilt = Math.max(-0.6, Math.min(1.2, camTilt + (touch.pageY - lastTouchY) * 0.008));
+            lastTouchX = touch.pageX; lastTouchY = touch.pageY;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            let inputX = 0, inputZ = 0;
+            if (keys.w) inputZ -= 1; if (keys.s) inputZ += 1;
+            if (keys.a) inputX -= 1; if (keys.d) inputX += 1;
+            const isMoving = inputX !== 0 || inputZ !== 0;
+
+            if (isMoving) {
+                const moveVec = new THREE.Vector3(inputX, 0, inputZ).normalize();
+                moveVec.applyAxisAngle(new THREE.Vector3(0, 1, 0), camAngle);
+                const speed = 0.28;
+                player.position.x += moveVec.x * speed;
+                player.position.z += moveVec.z * speed;
+                if (shiftLock) {
+                    player.rotation.y = camAngle + Math.PI;
+                } else {
+                    const targetRot = Math.atan2(moveVec.x, moveVec.z);
+                    let diff = targetRot - player.rotation.y;
+                    while (diff > Math.PI) diff -= Math.PI * 2;
+                    while (diff < -Math.PI) diff += Math.PI * 2;
+                    player.rotation.y += diff * 0.15;
+                }
+            } else if (shiftLock) {
+                player.rotation.y = camAngle + Math.PI;
+            }
+
+            // SEND DATA TO SERVER
+            socket.emit('move', { 
+                name: myName, 
+                x: player.position.x, 
+                y: player.position.y, 
+                z: player.position.z, 
+                rot: player.rotation.y, 
+                moving: isMoving || !isGrounded 
+            });
+
+            // Update remote peers
+            for (const id in peers) {
+                const p = peers[id];
+                p.mesh.position.lerp(p.targetPos, 0.2);
+                let diff = p.targetRot - p.mesh.rotation.y;
+                while (diff > Math.PI) diff -= Math.PI * 2;
+                while (diff < -Math.PI) diff += Math.PI * 2;
+                p.mesh.rotation.y += diff * 0.2;
+                if (p.isMoving) {
+                    p.walkTime += 0.25; const swing = Math.sin(p.walkTime) * 0.8;
+                    p.legL.rotation.x = swing; p.legR.rotation.x = -swing;
+                    p.armL.rotation.x = -swing; p.armR.rotation.x = swing;
+                    p.uGroup.position.y = 2 + Math.abs(Math.sin(p.walkTime)) * 0.1;
+                } else {
+                    p.legL.rotation.x = THREE.MathUtils.lerp(p.legL.rotation.x, 0, 0.1);
+                    p.legR.rotation.x = THREE.MathUtils.lerp(p.legR.rotation.x, 0, 0.1);
+                    p.armL.rotation.x = THREE.MathUtils.lerp(p.armL.rotation.x, 0, 0.1);
+                    p.armR.rotation.x = THREE.MathUtils.lerp(p.armR.rotation.x, 0, 0.1);
+                    p.uGroup.position.y = THREE.MathUtils.lerp(p.uGroup.position.y, 2, 0.1);
+                    p.walkTime = 0;
+                }
+            }
+
+            // Animate Local Player
+            if (!isGrounded) {
+                armLGroup.rotation.x = THREE.MathUtils.lerp(armLGroup.rotation.x, -2.8, 0.15);
+                armRGroup.rotation.x = THREE.MathUtils.lerp(armRGroup.rotation.x, -2.8, 0.15);
+                const kick = 0.8;
+                legLGroup.rotation.x = THREE.MathUtils.lerp(legLGroup.rotation.x, jumpCounter % 2 === 0 ? kick : -kick, 0.15);
+                legRGroup.rotation.x = THREE.MathUtils.lerp(legRGroup.rotation.x, jumpCounter % 2 === 0 ? -kick : kick, 0.15);
+            } else if (isMoving) {
+                walkTime += 0.25; const swing = Math.sin(walkTime) * 0.8;
+                legLGroup.rotation.x = swing; legRGroup.rotation.x = -swing;
+                armLGroup.rotation.x = -swing; armRGroup.rotation.x = swing;
+                upperBodyGroup.position.y = 2 + Math.abs(Math.sin(walkTime)) * 0.1;
+            } else {
+                const lerp = 0.1; const breath = Math.sin(Date.now() * 0.002) * 0.03;
+                legLGroup.rotation.x = THREE.MathUtils.lerp(legLGroup.rotation.x, 0, lerp);
+                legRGroup.rotation.x = THREE.MathUtils.lerp(legRGroup.rotation.x, 0, lerp);
+                armLGroup.rotation.x = THREE.MathUtils.lerp(armLGroup.rotation.x, 0, lerp);
+                armRGroup.rotation.x = THREE.MathUtils.lerp(armRGroup.rotation.x, 0, lerp);
+                upperBodyGroup.position.y = THREE.MathUtils.lerp(upperBodyGroup.position.y, 2 + breath, lerp);
+                walkTime = 0;
+            }
+
+            velocityY -= 0.025; player.position.y += velocityY;
+            if (player.position.y <= 0) { player.position.y = 0; velocityY = 0; isGrounded = true; }
+
+            const followDist = 14; const sideOffset = shiftLock ? 3 : 0; 
+            const offsetVec = new THREE.Vector3(sideOffset, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), camAngle);
+            camera.position.x = player.position.x + Math.sin(camAngle) * followDist + offsetVec.x;
+            camera.position.y = player.position.y + 6 + (camTilt * 10);
+            camera.position.z = player.position.z + Math.cos(camAngle) * followDist + offsetVec.z;
+            camera.lookAt(player.position.x + offsetVec.x, player.position.y + 4, player.position.z + offsetVec.z);
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+        animate();
+    </script>
+</body>
+</html>

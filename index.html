@@ -2,9 +2,124 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My First Page</title>
+    <title>Login & Sign Up</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .form-container {
+            background-color: #ffffff;
+            border: 2px solid #000000;
+            padding: 30px;
+            width: 320px;
+        }
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #000000;
+            font-size: 14px;
+            background-color: #ffffff;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: 2px solid #0000ff;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        button:hover {
+            background-color: #333333;
+        }
+        .switch-link {
+            display: block;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #0000ff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello World!</h1>
+
+    <div class="form-container">
+        <h2>Log In</h2>
+        <form>
+            <div class="form-group">
+                <label>Username or Email</label>
+                <input type="text" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" required>
+            </div>
+            <button type="submit">Sign In</button>
+        </form>
+        <span class="switch-link">Forgot Password?</span>
+    </div>
+
+    <div class="form-container">
+        <h2>Sign Up</h2>
+        <form>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" required>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" required>
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" required>
+            </div>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+
 </body>
 </html>

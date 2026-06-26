@@ -3,302 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criticality</title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-        body {
-            background-color: #EFEFEF;
-            color: #3F4143;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 40px;
-            margin-bottom: -10px;
-        }
-
-        .logo-image {
-            max-width: 320px;
-            height: auto;
-            display: block;
-        }
-
-        .main-container {
-            max-width: 900px;
-            width: 100%;
-            margin: 40px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 30px;
-        }
-
-        @media (max-width: 768px) {
-            .main-container {
-                grid-template-columns: 1fr;
-                margin: 20px auto;
-            }
-            .logo-container {
-                margin-top: 25px;
-            }
-        }
-
-        .auth-card {
-            background-color: #FFFFFF;
-            border: 1px solid #BDC3C7;
-            border-radius: 8px;
-            padding: 30px;
-        }
-
-        .card-header {
-            margin-bottom: 25px;
-        }
-
-        .card-header h2 {
-            font-size: 26px;
-            font-weight: bold;
-            color: #111111;
-            letter-spacing: -0.5px;
-        }
-
-        .card-header p {
-            font-size: 13px;
-            color: #666666;
-            margin-top: 3px;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 6px;
-            color: #333333;
-            font-size: 13px;
-        }
-
-        input[type="text"],
-        input[type="password"],
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #A4A9AD;
-            border-radius: 6px;
-            background-color: #F8F9FA;
-            font-size: 14px;
-            color: #000000;
-            outline: none;
-        }
-
-        input[type="text"]:focus,
-        input[type="password"]:focus,
-        select:focus {
-            border-color: #0055A5;
-            background-color: #FFFFFF;
-        }
-
-        .birthday-group {
-            display: grid;
-            grid-template-columns: 1.3fr 1fr 1fr;
-            gap: 8px;
-        }
-
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            color: #FFFFFF;
-            text-align: center;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .btn-signup {
-            background-color: #02B702;
-        }
-
-        .btn-signup:hover {
-            background-color: #02D102;
-        }
-
-        .btn-signin {
-            background-color: #0077E6;
-        }
-
-        .btn-signin:hover {
-            background-color: #1A88FF;
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: #555555;
-            font-size: 12px;
-            margin-top: auto;
-            border-top: 1px solid #D6D6D6;
-            background-color: #E8E8E8;
-        }
-    </style>
+    <title>Criticality Portal</title>
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-
-    <div class="logo-container">
-        <img src="icon.png" alt="Criticality" class="logo-image">
+    <div class="container">
+        <div id="auth-box" class="card">
+            <h2 id="form-title">Sign In</h2>
+            <form id="auth-form">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required autocomplete="current-password">
+                </div>
+                <div class="input-group id-signup" style="display: none;">
+                    <label for="birthday">Birthday</label>
+                    <input type="date" id="birthday">
+                </div>
+                <button type="submit" id="submit-btn">Login</button>
+            </form>
+            <p id="toggle-text">Don't have an account? <a href="#" id="toggle-link">Sign Up</a></p>
+            <div id="message" class="message"></div>
+        </div>
     </div>
-
-    <main class="main-container">
-        
-        <section class="auth-card">
-            <div class="card-header">
-                <h2>Sign Up</h2>
-                <p>Create a free account to start playing and building</p>
-            </div>
-            
-            <form id="signupForm">
-                <div class="form-group">
-                    <label>Birthday</label>
-                    <div class="birthday-group">
-                        <select name="month" required>
-                            <option value="">Month</option>
-                            <option value="1">January</option>
-                            <option value="2">February</option>
-                            <option value="3">March</option>
-                            <option value="4">April</option>
-                            <option value="5">May</option>
-                            <option value="6">June</option>
-                            <option value="7">July</option>
-                            <option value="8">August</option>
-                            <option value="9">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
-                        </select>
-                        <select name="day" required>
-                            <option value="">Day</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
-                        <select name="year" required>
-                            <option value="">Year</option>
-                            <option value="2012">2012</option>
-                            <option value="2011">2011</option>
-                            <option value="2010">2010</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="reg-username">Username</label>
-                    <input type="text" id="reg-username" name="username" placeholder="Don't use your real name" minlength="3" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="reg-password">Password</label>
-                    <input type="password" id="reg-password" name="password" placeholder="At least 4 characters" minlength="4" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="reg-confirm">Confirm Password</label>
-                    <input type="password" id="reg-confirm" name="confirm_password" placeholder="Type password again" required>
-                </div>
-
-                <button type="submit" class="btn btn-signup">Sign Up</button>
-            </form>
-        </section>
-
-        <section class="auth-card">
-            <div class="card-header">
-                <h2>Sign In</h2>
-                <p>Log in with your existing account</p>
-            </div>
-            
-            <form id="signinForm">
-                <div class="form-group">
-                    <label for="login-username">Username</label>
-                    <input type="text" id="login-username" name="username" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" name="password" required>
-                </div>
-
-                <button type="submit" class="btn btn-signin">Sign In</button>
-            </form>
-        </section>
-
-    </main>
-
-    <footer>
-        <p>&copy; 2026 Criticality. All rights reserved.</p>
-    </footer>
-
     <script>
-        // Handle Sign Up Submission
-        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+        const authForm = document.getElementById('auth-form');
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const toggleLink = document.getElementById('toggle-link');
+        const toggleText = document.getElementById('toggle-text');
+        const signupFields = document.querySelectorAll('.id-signup');
+        const birthdayInput = document.getElementById('birthday');
+        const messageDiv = document.getElementById('message');
+
+        let isSignUp = false;
+
+        toggleLink.addEventListener('click', (e) => {
             e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
+            isSignUp = !isSignUp;
+            messageDiv.textContent = '';
+            messageDiv.className = 'message';
 
-            if (data.password !== data.confirm_password) {
-                alert("Passwords do not match!");
-                return;
+            if (isSignUp) {
+                formTitle.textContent = 'Sign Up';
+                submitBtn.textContent = 'Register';
+                toggleText.innerHTML = 'Already have an account? <a href="#" id="toggle-link">Sign In</a>';
+                signupFields.forEach(f => f.style.display = 'block');
+                birthdayInput.required = true;
+            } else {
+                formTitle.textContent = 'Sign In';
+                submitBtn.textContent = 'Login';
+                toggleText.innerHTML = 'Don\'t have an account? <a href="#" id="toggle-link">Sign Up</a>';
+                signupFields.forEach(f => f.style.display = 'none');
+                birthdayInput.required = false;
             }
-
-            try {
-                const response = await fetch('/api/signup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                alert(result.message);
-                if(response.ok) e.target.reset();
-            } catch (err) {
-                alert("Error connecting to server.");
-            }
+            
+            document.getElementById('toggle-link').addEventListener('click', arguments.callee);
         });
 
-        // Handle Sign In Submission
-        document.getElementById('signinForm').addEventListener('submit', async (e) => {
+        authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
+            messageDiv.textContent = '';
+            messageDiv.className = 'message';
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const endpoint = isSignUp ? '/api/signup' : '/api/signin';
+            const payload = { username, password };
+
+            if (isSignUp) {
+                payload.birthday = birthdayInput.value;
+            }
 
             try {
-                const response = await fetch('/api/signin', {
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(payload)
                 });
-                const result = await response.json();
-                alert(result.message);
-                if(response.ok && result.token) {
-                    // Storing authentication token locally
-                    localStorage.setItem('authToken', result.token);
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    messageDiv.textContent = data.message;
+                    messageDiv.classList.add('success');
+                    if (!isSignUp && data.token) {
+                        localStorage.setItem('token', data.token);
+                    }
+                    authForm.reset();
+                } else {
+                    messageDiv.textContent = data.message || 'An error occurred';
+                    messageDiv.classList.add('error');
                 }
             } catch (err) {
-                alert("Error connecting to server.");
+                messageDiv.textContent = 'Cannot connect to server';
+                messageDiv.classList.add('error');
             }
         });
     </script>

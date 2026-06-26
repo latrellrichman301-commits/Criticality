@@ -17,19 +17,15 @@ body {
 
 .logo-container {
     margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.logo-text {
-    font-size: 56px;
-    font-weight: 900;
-    color: #2ed546;
-    text-shadow: 
-        -2px -2px 0 #000,  
-         2px -2px 0 #000,
-        -2px  2px 0 #000,
-         2px  2px 0 #000,
-         0px  4px 0px #000;
-    letter-spacing: 1px;
+.logo-image {
+    max-width: 120px;
+    height: auto;
+    object-fit: contain;
 }
 
 .main-layout {
@@ -141,48 +137,16 @@ button {
     display: none;
 }
 
+.message.success {
+    display: block;
+    background-color: #e6f4ea;
+    color: #137333;
+}
+
 .message.error {
     display: block;
     background-color: #fce8e6;
     color: #c5221f;
-}
-
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 6px;
-    max-width: 400px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-}
-
-.modal-content h3 {
-    margin-bottom: 10px;
-}
-
-.modal-content p {
-    font-size: 14px;
-    color: #555555;
-    margin-bottom: 20px;
-}
-
-.modal-content button {
-    background-color: #000000;
-    color: #ffffff;
 }
 
 .site-footer {

@@ -9,180 +9,165 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         body {
-            background-color: #f0f2f5;
-            color: #1e293b;
-            font-size: 15px;
+            background-color: #EFEFEF;
+            color: #3F4143;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
         header {
-            background: linear-gradient(135deg, #0056b3, #002d62);
-            padding: 16px 40px;
+            background-color: #001A35;
+            padding: 12px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-bottom: 4px solid #001122;
         }
 
         .logo {
-            color: #ffffff;
-            font-size: 32px;
+            color: #FFFFFF;
+            font-size: 34px;
             font-weight: 900;
+            font-style: italic;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            text-shadow: 2px 3px 0px rgba(0,0,0,0.15);
+            letter-spacing: -1px;
         }
 
         .header-status {
-            color: #ffb703;
-            font-weight: 800;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            color: #FFA500;
+            font-weight: bold;
+            font-size: 14px;
         }
 
         .main-container {
-            max-width: 1040px;
+            max-width: 900px;
             width: 100%;
-            margin: auto;
-            padding: 40px 20px;
+            margin: 50px auto;
+            padding: 0 20px;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 32px;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 30px;
         }
 
         @media (max-width: 768px) {
             .main-container {
                 grid-template-columns: 1fr;
-                padding: 20px;
+                margin: 20px auto;
             }
         }
 
         .auth-card {
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 36px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .auth-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.07);
+            background-color: #FFFFFF;
+            border: 1px solid #BDC3C7;
+            border-radius: 8px;
+            padding: 30px;
         }
 
         .card-header {
-            border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 16px;
-            margin-bottom: 24px;
+            margin-bottom: 25px;
         }
 
         .card-header h2 {
-            font-size: 24px;
-            font-weight: 800;
-            color: #0f172a;
+            font-size: 26px;
+            font-weight: bold;
+            color: #111111;
+            letter-spacing: -0.5px;
         }
 
         .card-header p {
-            font-size: 14px;
-            color: #64748b;
-            margin-top: 6px;
+            font-size: 13px;
+            color: #666666;
+            margin-top: 3px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         label {
             display: block;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #334155;
-            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #333333;
+            font-size: 13px;
         }
 
         input[type="text"],
         input[type="password"],
         select {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #cbd5e1;
-            border-radius: 10px;
-            background-color: #f8fafc;
-            font-size: 15px;
-            color: #0f172a;
+            padding: 10px;
+            border: 1px solid #A4A9AD;
+            border-radius: 6px;
+            background-color: #F8F9FA;
+            font-size: 14px;
+            color: #000000;
             outline: none;
-            transition: all 0.2s ease;
         }
 
         input[type="text"]:focus,
         input[type="password"]:focus,
         select:focus {
-            border-color: #0056b3;
-            background-color: #ffffff;
-            box-shadow: 0 0 0 4px rgba(0, 86, 179, 0.15);
+            border-color: #0055A5;
+            background-color: #FFFFFF;
         }
 
         .birthday-group {
             display: grid;
-            grid-template-columns: 1.2fr 1fr 1fr;
-            gap: 12px;
+            grid-template-columns: 1.3fr 1fr 1fr;
+            gap: 8px;
         }
 
         .btn {
-            display: inline-block;
+            display: block;
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             font-size: 16px;
-            font-weight: 700;
-            color: #ffffff;
+            font-weight: bold;
+            color: #FFFFFF;
             text-align: center;
             border: none;
-            border-radius: 10px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .btn-signup {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background-color: #02B702;
+            border-bottom: 3px solid #018401;
         }
 
         .btn-signup:hover {
-            background: linear-gradient(135deg, #34d399, #059669);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 12px -2px rgba(16, 185, 129, 0.3);
+            background-color: #02D102;
         }
 
         .btn-signin {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            background-color: #0077E6;
+            border-bottom: 3px solid #0055A5;
         }
 
         .btn-signin:hover {
-            background: linear-gradient(135deg, #60a5fa, #1d4ed8);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 12px -2px rgba(59, 130, 246, 0.3);
+            background-color: #1A88FF;
         }
 
         .btn:active {
-            transform: translateY(1px);
+            border-bottom: none;
+            margin-top: 3px;
+            padding-bottom: 9px;
         }
 
         footer {
             text-align: center;
-            padding: 24px;
-            color: #64748b;
-            font-size: 13px;
+            padding: 20px;
+            color: #555555;
+            font-size: 12px;
             margin-top: auto;
-            border-top: 1px solid #e2e8f0;
-            background-color: #ffffff;
+            border-top: 1px solid #D6D6D6;
+            background-color: #E8E8E8;
         }
     </style>
 </head>
@@ -190,15 +175,15 @@
 
     <header>
         <div class="logo">Criticality</div>
-        <div class="header-status">Powering Imagination</div>
+        <div class="header-status">ONLINE USER PORTAL</div>
     </header>
 
     <main class="main-container">
         
         <section class="auth-card">
             <div class="card-header">
-                <h2>Create Account</h2>
-                <p>Join the community and start building</p>
+                <h2>Sign Up</h2>
+                <p>Create a free account to start playing and building</p>
             </div>
             
             <form action="#" method="POST">
@@ -239,17 +224,17 @@
 
                 <div class="form-group">
                     <label for="reg-username">Username</label>
-                    <input type="text" id="reg-username" name="username" placeholder="Choose a unique name" minlength="3" required>
+                    <input type="text" id="reg-username" name="username" placeholder="Don't use your real name" minlength="3" required>
                 </div>
 
                 <div class="form-group">
                     <label for="reg-password">Password</label>
-                    <input type="password" id="reg-password" name="password" placeholder="Minimum 4 characters" minlength="4" required>
+                    <input type="password" id="reg-password" name="password" placeholder="At least 4 characters" minlength="4" required>
                 </div>
 
                 <div class="form-group">
                     <label for="reg-confirm">Confirm Password</label>
-                    <input type="password" id="reg-confirm" name="confirm_password" placeholder="Repeat your password" required>
+                    <input type="password" id="reg-confirm" name="confirm_password" placeholder="Type password again" required>
                 </div>
 
                 <button type="submit" class="btn btn-signup">Sign Up</button>
@@ -258,19 +243,19 @@
 
         <section class="auth-card">
             <div class="card-header">
-                <h2>User Login</h2>
-                <p>Access your profile and digital workshop</p>
+                <h2>Sign In</h2>
+                <p>Log in with your existing account</p>
             </div>
             
             <form action="#" method="POST">
                 <div class="form-group">
                     <label for="login-username">Username</label>
-                    <input type="text" id="login-username" name="username" placeholder="Enter username" required>
+                    <input type="text" id="login-username" name="username" required>
                 </div>
 
                 <div class="form-group">
                     <label for="login-password">Password</label>
-                    <input type="password" id="login-password" name="password" placeholder="Enter password" required>
+                    <input type="password" id="login-password" name="password" required>
                 </div>
 
                 <button type="submit" class="btn btn-signin">Sign In</button>
@@ -280,7 +265,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 Criticality Corporation. All rights reserved.</p>
+        <p>&copy; 2026 Criticality. All rights reserved.</p>
     </footer>
 
 </body>

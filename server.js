@@ -8,28 +8,25 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
-// Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to Database successfully.'))
   .catch(err => console.error('Database connection error:', err));
 
-// User Schema & Model
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
+  email: { type: String, required: true },
   password: { type: String, required: true },
   birthday: { type: String, required: true }
 });
 
 const User = mongoose.model('User', userSchema);
 
-// API Routes
 app.post('/api/signup', async (req, res) => {
   try {
-    const { username, password, birthday } = req.body;
+    const { username, email, password, birthday } = req.body;
     
     const existingUser = await User.findOne({ username: username.toLowerCase() });
     if (existingUser) {
@@ -39,6 +36,7 @@ app.post('/api/signup', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       username: username.toLowerCase(),
+      email,
       password: hashedPassword,
       birthday
     });
@@ -71,7 +69,6 @@ app.post('/api/signin', async (req, res) => {
   }
 });
 
-// Wildcard route to handle UI pages (Using Express v5 compatible regex matching)
 app.get(/(.*)/, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

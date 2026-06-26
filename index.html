@@ -2,124 +2,262 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login & Sign Up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criticality</title>
     <style>
+        /* --- OG Nostalgia Styling --- */
         * {
             box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
             margin: 0;
-            padding: 40px 20px;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: #E3E3E3;
+            color: #333;
+            font-size: 14px;
+        }
+
+        /* Top Navigation Header */
+        header {
+            background: linear-gradient(to bottom, #0055A5, #003366);
+            border-bottom: 3px solid #002244;
+            padding: 10px 20px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            gap: 40px;
-            flex-wrap: wrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        .form-container {
-            background-color: #ffffff;
-            border: 2px solid #000000;
-            padding: 30px;
-            width: 320px;
-        }
-        h2 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 24px;
+
+        .logo {
+            color: #FFFFFF;
+            font-size: 28px;
+            font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
-            border-bottom: 2px solid #000000;
-            padding-bottom: 5px;
+            text-shadow: 2px 2px #001122;
         }
+
+        .header-status {
+            color: #FFA500;
+            font-weight: bold;
+            font-size: 12px;
+            text-shadow: 1px 1px #000;
+        }
+
+        /* Main Container Layout */
+        .main-container {
+            max-width: 960px;
+            margin: 40px auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                margin: 20px auto;
+            }
+        }
+
+        /* Form Card Styling */
+        .auth-card {
+            background-color: #FFFFFF;
+            border: 1px solid #A7A7A7;
+            border-radius: 4px;
+            padding: 25px;
+            box-shadow: 3px 3px 0px #C0C0C0;
+        }
+
+        .card-header {
+            border-bottom: 2px solid #E5E5E5;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card-header h2 {
+            font-size: 22px;
+            color: #222;
+        }
+
+        .card-header p {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* Form Elements */
         .form-group {
             margin-bottom: 15px;
         }
+
         label {
             display: block;
-            margin-bottom: 5px;
             font-weight: bold;
-            font-size: 14px;
+            margin-bottom: 5px;
+            color: #444;
+            font-size: 13px;
         }
+
         input[type="text"],
-        input[type="email"],
-        input[type="password"] {
+        input[type="password"],
+        select {
             width: 100%;
             padding: 8px;
-            border: 2px solid #000000;
+            border: 1px solid #A7A7A7;
+            border-radius: 3px;
+            background-color: #FAFAFA;
             font-size: 14px;
-            background-color: #ffffff;
+            outline: none;
         }
+
         input[type="text"]:focus,
-        input[type="email"]:focus,
-        input[type="password"]:focus {
-            outline: 2px solid #0000ff;
+        input[type="password"]:focus,
+        select:focus {
+            border-color: #0055A5;
+            background-color: #FFF;
         }
-        button {
+
+        /* Birthday Selectors Group */
+        .birthday-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* Buttons with classic gradient behaviors */
+        .btn {
+            display: inline-block;
             width: 100%;
             padding: 10px;
-            background-color: #000000;
-            color: #ffffff;
-            border: none;
-            font-weight: bold;
             font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            border: 1px solid;
+            border-radius: 4px;
             cursor: pointer;
-            text-transform: uppercase;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
         }
-        button:hover {
-            background-color: #333333;
+
+        .btn-signup {
+            background: linear-gradient(to bottom, #02C702, #019601);
+            border-color: #017301;
+            text-shadow: 1px 1px #015201;
         }
-        .switch-link {
-            display: block;
-            margin-top: 15px;
-            font-size: 12px;
-            color: #0000ff;
-            text-decoration: underline;
-            cursor: pointer;
+
+        .btn-signup:hover {
+            background: linear-gradient(to bottom, #02E102, #01A601);
+        }
+
+        .btn-signin {
+            background: linear-gradient(to bottom, #0077E6, #004499);
+            border-color: #003377;
+            text-shadow: 1px 1px #002255;
+        }
+
+        .btn-signin:hover {
+            background: linear-gradient(to bottom, #0088FF, #0055BB);
+        }
+
+        /* Footer Notes */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #777;
+            font-size: 11px;
+            border-top: 1px solid #D0D0D0;
         }
     </style>
 </head>
 <body>
 
-    <div class="form-container">
-        <h2>Log In</h2>
-        <form>
-            <div class="form-group">
-                <label>Username or Email</label>
-                <input type="text" required>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" required>
-            </div>
-            <button type="submit">Sign In</button>
-        </form>
-        <span class="switch-link">Forgot Password?</span>
-    </div>
+    <header>
+        <div class="logo">Criticality</div>
+        <div class="header-status">BUILDING THE FUTURE since 2026</div>
+    </header>
 
-    <div class="form-container">
-        <h2>Sign Up</h2>
-        <form>
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" required>
+    <main class="main-container">
+        
+        <section class="auth-card">
+            <div class="card-header">
+                <h2>Create a Free Account</h2>
+                <p>Join millions of builders and players today!</p>
             </div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" required>
+            
+            <form action="#" method="POST">
+                <div class="form-group">
+                    <label>Birthday</label>
+                    <div class="birthday-group">
+                        <select name="month" required>
+                            <option value="">Month</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            </select>
+                        <select name="day" required>
+                            <option value="">Day</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            </select>
+                        <select name="year" required>
+                            <option value="">Year</option>
+                            <option value="2012">2012</option>
+                            <option value="2011">2011</option>
+                            <option value="2010">2010</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-username">Username</label>
+                    <input type="text" id="reg-username" name="username" placeholder="Don't use your real name" minlength="3" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" name="password" placeholder="At least 4 characters" minlength="4" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-confirm">Confirm Password</label>
+                    <input type="password" id="reg-confirm" name="confirm_password" required>
+                </div>
+
+                <button type="submit" class="btn btn-signup">Sign Up</button>
+            </form>
+        </section>
+
+        <section class="auth-card">
+            <div class="card-header">
+                <h2>Member Login</h2>
+                <p>Log in to access your places and character customizing.</p>
             </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" required>
-            </div>
-            <div class="form-group">
-                <label>Confirm Password</label>
-                <input type="password" required>
-            </div>
-            <button type="submit">Register</button>
-        </form>
-    </div>
+            
+            <form action="#" method="POST">
+                <div class="form-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" name="password" required>
+                </div>
+
+                <button type="submit" class="btn btn-signin">Sign In</button>
+            </form>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Criticality Corporation. This page is a custom interface styling demonstration.</p>
+    </footer>
 
 </body>
 </html>

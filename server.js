@@ -56,7 +56,7 @@ app.post('/api/signup', async (req, res) => {
 
     res.status(201).json({ message: 'Verification sent to inbox' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error during signup' });
+    res.status(500).json({ message: `Server error during signup: ${error.message}` });
   }
 });
 

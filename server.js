@@ -9,15 +9,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
+// Middleware to parse incoming form data correctly
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, {
   dbName: 'CriticalityApp'
 })
   .then(() => console.log('Connected to Database successfully.'))
   .catch(err => console.error('Database connection error:', err));
 
+// Database Schema
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true },
@@ -28,6 +32,7 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
+// Nodemailer Transport Configuration
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -36,7 +41,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// DIAGNOSTIC SCANNER: This tests your Gmail connection on startup
+// Verify Gmail Connection on Boot
 transporter.verify((error, success) => {
   if (error) {
     console.log('====================================');
@@ -49,12 +54,24 @@ transporter.verify((error, success) => {
   }
 });
 
+// Signup Route
 app.post('/api/signup', async (req, res) => {
+  console.log('====================================');
+  console.log('NEW SIGNUP ATTEMPT RECEIVED!');
+  console.log('Data sent from browser:', req.body);
+  console.log('====================================');
+
   try {
     const { username, email, password, birthday } = req.body;
     
+    if (!username || !email || !password || !birthday) {
+      console.log('🚨 REJECTED: Missing information from form.');
+      return res.status(400).json({ message: 'Please fill out all fields.' });
+    }
+
     const existingUser = await User.findOne({ username: username.toLowerCase() });
     if (existingUser) {
+      console.log(`🚨 REJECTED: Username '${username}' is already taken!`);
       return res.status(400).json({ message: 'Username already exists' });
     }
 
@@ -68,6 +85,7 @@ app.post('/api/signup', async (req, res) => {
     });
 
     await newUser.save();
+    console.log(`✅ SUCCESS: User '${newUser.username}' saved to database.`);
 
     const domain = req.get('host');
     const protocol = req.protocol;
@@ -95,13 +113,16 @@ app.post('/api/signup', async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
+    console.log(`✅ SUCCESS: Verification email fired off to ${email}!`);
 
     res.status(201).json({ message: 'Verification sent to inbox' });
   } catch (error) {
+    console.log('❌ CRITICAL SERVER ERROR:', error.message);
     res.status(500).json({ message: `Server error during signup: ${error.message}` });
   }
 });
 
+// Verification Endpoint
 app.get('/api/verify/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -118,6 +139,7 @@ app.get('/api/verify/:id', async (req, res) => {
   }
 });
 
+// Signin Route
 app.post('/api/signin', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -143,6 +165,7 @@ app.post('/api/signin', async (req, res) => {
   }
 });
 
+// Fallback Route to serve SPA frontend
 app.get(/(.*)/, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

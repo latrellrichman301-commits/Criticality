@@ -7,102 +7,194 @@
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <div class="container">
-        <div id="auth-box" class="card">
-            <h2 id="form-title">Sign In</h2>
-            <form id="auth-form">
+    <div class="logo-container">
+        <h1 class="logo-text">Criticality</h1>
+    </div>
+
+    <div class="main-layout">
+        <div class="card">
+            <h2>Sign Up</h2>
+            <p class="subtitle">Create a free account to start playing and building</p>
+            <form id="signup-form">
                 <div class="input-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" required autocomplete="username">
+                    <label>Birthday</label>
+                    <div class="birthday-row">
+                        <select id="birth-month" required>
+                            <option value="" disabled selected>Month</option>
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                        <select id="birth-day" required>
+                            <option value="" disabled selected>Day</option>
+                            <script>
+                                for(let i=1; i<=31; i++) {
+                                    document.write(`<option value="${i.toString().padStart(2, '0')}">${i}</option>`);
+                                }
+                            </script>
+                        </select>
+                        <select id="birth-year" required>
+                            <option value="" disabled selected>Year</option>
+                            <script>
+                                const currentYear = new Date().getFullYear();
+                                for(let i=currentYear; i>=1900; i--) {
+                                    document.write(`<option value="${i}">${i}</option>`);
+                                }
+                            </script>
+                        </select>
+                    </div>
                 </div>
                 <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" required autocomplete="current-password">
+                    <label for="signup-username">Username</label>
+                    <input type="text" id="signup-username" placeholder="Don't use your real name" required autocomplete="username">
                 </div>
-                <div class="input-group id-signup" style="display: none;">
-                    <label for="birthday">Birthday</label>
-                    <input type="date" id="birthday">
+                <div class="input-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" placeholder="At least 4 characters" required autocomplete="new-password">
                 </div>
-                <button type="submit" id="submit-btn">Login</button>
+                <div class="input-group">
+                    <label for="signup-confirm">Confirm Password</label>
+                    <input type="password" id="signup-confirm" placeholder="Type password again" required autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn-signup">Sign Up</button>
             </form>
-            <p id="toggle-text">Don't have an account? <a href="#" id="toggle-link">Sign Up</a></p>
-            <div id="message" class="message"></div>
+            <div id="signup-message" class="message"></div>
+        </div>
+
+        <div class="card">
+            <h2>Sign In</h2>
+            <p class="subtitle">Log in with your existing account</p>
+            <form id="signin-form">
+                <div class="input-group">
+                    <label for="signin-username">Username</label>
+                    <input type="text" id="signin-username" required autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <label for="signin-password">Password</label>
+                    <input type="password" id="signin-password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn-signin">Sign In</button>
+            </form>
+            <div id="signin-message" class="message"></div>
         </div>
     </div>
+
+    <div id="email-modal" class="modal">
+        <div class="modal-content">
+            <h3>Email Verification Needed</h3>
+            <p>Please enter your email address to secure your account credentials.</p>
+            <form id="email-form">
+                <input type="email" id="user-email" placeholder="Enter your email address" required>
+                <button type="submit">Verify Email</button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <p>Website Name: <strong>Criticality</strong> | URL: <a href="https://criticality.onrender.com" target="_blank">https://criticality.onrender.com</a></p>
+    </footer>
+
     <script>
-        const authForm = document.getElementById('auth-form');
-        const formTitle = document.getElementById('form-title');
-        const submitBtn = document.getElementById('submit-btn');
-        const toggleLink = document.getElementById('toggle-link');
-        const toggleText = document.getElementById('toggle-text');
-        const signupFields = document.querySelectorAll('.id-signup');
-        const birthdayInput = document.getElementById('birthday');
-        const messageDiv = document.getElementById('message');
+        const signupForm = document.getElementById('signup-form');
+        const signinForm = document.getElementById('signin-form');
+        const signupMessage = document.getElementById('signup-message');
+        const signinMessage = document.getElementById('signin-message');
+        const emailModal = document.getElementById('email-modal');
+        const emailForm = document.getElementById('email-form');
 
-        let isSignUp = false;
-
-        toggleLink.addEventListener('click', (e) => {
+        signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            isSignUp = !isSignUp;
-            messageDiv.textContent = '';
-            messageDiv.className = 'message';
-
-            if (isSignUp) {
-                formTitle.textContent = 'Sign Up';
-                submitBtn.textContent = 'Register';
-                toggleText.innerHTML = 'Already have an account? <a href="#" id="toggle-link">Sign In</a>';
-                signupFields.forEach(f => f.style.display = 'block');
-                birthdayInput.required = true;
-            } else {
-                formTitle.textContent = 'Sign In';
-                submitBtn.textContent = 'Login';
-                toggleText.innerHTML = 'Don\'t have an account? <a href="#" id="toggle-link">Sign Up</a>';
-                signupFields.forEach(f => f.style.display = 'none');
-                birthdayInput.required = false;
-            }
+            signupMessage.className = 'message';
             
-            document.getElementById('toggle-link').addEventListener('click', arguments.callee);
-        });
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
 
-        authForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            messageDiv.textContent = '';
-            messageDiv.className = 'message';
-
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            const endpoint = isSignUp ? '/api/signup' : '/api/signin';
-            const payload = { username, password };
-
-            if (isSignUp) {
-                payload.birthday = birthdayInput.value;
+            if (password.length < 4) {
+                signupMessage.textContent = 'Password must be at least 4 characters long';
+                signupMessage.classList.add('error');
+                return;
             }
+
+            if (password !== confirm) {
+                signupMessage.textContent = 'Passwords do not match';
+                signupMessage.classList.add('error');
+                return;
+            }
+
+            const birthday = `${document.getElementById('birth-year').value}-${document.getElementById('birth-month').value}-${document.getElementById('birth-day').value}`;
+
+            const payload = {
+                username: document.getElementById('signup-username').value,
+                password,
+                birthday
+            };
 
             try {
-                const response = await fetch(endpoint, {
+                const response = await fetch('/api/signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
                 const data = await response.json();
 
                 if (response.ok) {
-                    messageDiv.textContent = data.message;
-                    messageDiv.classList.add('success');
-                    if (!isSignUp && data.token) {
-                        localStorage.setItem('token', data.token);
-                    }
-                    authForm.reset();
+                    signupForm.reset();
+                    emailModal.style.display = 'flex';
                 } else {
-                    messageDiv.textContent = data.message || 'An error occurred';
-                    messageDiv.classList.add('error');
+                    signupMessage.textContent = data.message;
+                    signupMessage.classList.add('error');
                 }
             } catch (err) {
-                messageDiv.textContent = 'Cannot connect to server';
-                messageDiv.classList.add('error');
+                signupMessage.textContent = 'Cannot connect to server';
+                signupMessage.classList.add('error');
             }
+        });
+
+        signinForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            signinMessage.className = 'message';
+
+            const payload = {
+                username: document.getElementById('signin-username').value,
+                password: document.getElementById('signin-password').value
+            };
+
+            try {
+                const response = await fetch('/api/signin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    signinForm.reset();
+                    emailModal.style.display = 'flex';
+                } else {
+                    signinMessage.textContent = data.message;
+                    signinMessage.classList.add('error');
+                }
+            } catch (err) {
+                signinMessage.textContent = 'Cannot connect to server';
+                signinMessage.classList.add('error');
+            }
+        });
+
+        emailForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Verification sequence updated successfully!');
+            emailModal.style.display = 'none';
+            emailForm.reset();
         });
     </script>
 </body>

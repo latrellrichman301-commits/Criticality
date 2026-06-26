@@ -36,6 +36,19 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// DIAGNOSTIC SCANNER: This tests your Gmail connection on startup
+transporter.verify((error, success) => {
+  if (error) {
+    console.log('====================================');
+    console.log('NODEMAILER GMAIL ERROR:', error.message);
+    console.log('====================================');
+  } else {
+    console.log('====================================');
+    console.log('Gmail is connected and ready to send emails! 🚀');
+    console.log('====================================');
+  }
+});
+
 app.post('/api/signup', async (req, res) => {
   try {
     const { username, email, password, birthday } = req.body;

@@ -21,7 +21,8 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
-  birthday: { type: String, required: true }
+  birthday: { type: String, required: true },
+  isVerified: { type: Boolean, default: false }
 }, { collection: 'users' });
 
 const User = mongoose.model('User', userSchema);
@@ -40,13 +41,38 @@ app.post('/api/signup', async (req, res) => {
       username: username.toLowerCase(),
       email,
       password: hashedPassword,
-      birthday
+      birthday,
+      isVerified: false
     });
 
     await newUser.save();
-    res.status(201).json({ message: 'User registered successfully!' });
+
+    const domain = req.get('host');
+    const protocol = req.protocol;
+    console.log('\n====================================');
+    console.log(`NEW SIGNUP FOR: ${username}`);
+    console.log(`CLICK THIS LINK TO VERIFY EMAIL: ${protocol}://${domain}/api/verify/${newUser._id}`);
+    console.log('====================================\n');
+
+    res.status(201).json({ message: 'Verification sent to inbox' });
   } catch (error) {
     res.status(500).json({ message: 'Server error during signup' });
+  }
+});
+
+app.get('/api/verify/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).send('<h1>Verification Failed</h1><p>User not found.</p>');
+    }
+
+    user.isVerified = true;
+    await user.save();
+
+    res.send('<h1>Email Verified Successfully!</h1><p>You can now close this tab, go back to Criticality, and log in.</p>');
+  } catch (error) {
+    res.status(500).send('<h1>Server Error</h1><p>Could not verify email.</p>');
   }
 });
 
@@ -57,6 +83,10 @@ app.post('/api/signin', async (req, res) => {
     
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    if (!user.isVerified) {
+      return res.status(400).json({ message: 'Please verify your email address before logging in.' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);

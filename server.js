@@ -11,7 +11,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI, {
+  dbName: 'CriticalityApp'
+})
   .then(() => console.log('Connected to Database successfully.'))
   .catch(err => console.error('Database connection error:', err));
 
@@ -20,7 +22,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   birthday: { type: String, required: true }
-});
+}, { collection: 'users' });
 
 const User = mongoose.model('User', userSchema);
 

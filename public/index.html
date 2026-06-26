@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -171,7 +171,7 @@
                 <p>Create a free account to start playing and building</p>
             </div>
             
-            <form action="#" method="POST">
+            <form id="signupForm">
                 <div class="form-group">
                     <label>Birthday</label>
                     <div class="birthday-group">
@@ -232,7 +232,7 @@
                 <p>Log in with your existing account</p>
             </div>
             
-            <form action="#" method="POST">
+            <form id="signinForm">
                 <div class="form-group">
                     <label for="login-username">Username</label>
                     <input type="text" id="login-username" name="username" required>
@@ -253,5 +253,54 @@
         <p>&copy; 2026 Criticality. All rights reserved.</p>
     </footer>
 
+    <script>
+        // Handle Sign Up Submission
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            if (data.password !== data.confirm_password) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                alert(result.message);
+                if(response.ok) e.target.reset();
+            } catch (err) {
+                alert("Error connecting to server.");
+            }
+        });
+
+        // Handle Sign In Submission
+        document.getElementById('signinForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/signin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                alert(result.message);
+                if(response.ok && result.token) {
+                    // Storing authentication token locally
+                    localStorage.setItem('authToken', result.token);
+                }
+            } catch (err) {
+                alert("Error connecting to server.");
+            }
+        });
+    </script>
 </body>
 </html>

@@ -20,10 +20,24 @@
             min-height: 100vh;
         }
 
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 40px;
+            margin-bottom: -10px;
+        }
+
+        .logo-image {
+            max-width: 320px;
+            height: auto;
+            display: block;
+        }
+
         .main-container {
             max-width: 900px;
             width: 100%;
-            margin: 50px auto;
+            margin: 40px auto;
             padding: 0 20px;
             display: grid;
             grid-template-columns: 1.2fr 1fr;
@@ -34,6 +48,9 @@
             .main-container {
                 grid-template-columns: 1fr;
                 margin: 20px auto;
+            }
+            .logo-container {
+                margin-top: 25px;
             }
         }
 
@@ -140,6 +157,10 @@
     </style>
 </head>
 <body>
+
+    <div class="logo-container">
+        <img src="icon.png" alt="Criticality" class="logo-image">
+    </div>
 
     <main class="main-container">
         

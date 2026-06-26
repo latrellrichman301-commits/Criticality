@@ -9,19 +9,16 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
-// Middleware to parse incoming form data correctly
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, {
   dbName: 'CriticalityApp'
 })
   .then(() => console.log('Connected to Database successfully.'))
   .catch(err => console.error('Database connection error:', err));
 
-// Database Schema
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true },
@@ -32,16 +29,17 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// Nodemailer Transport Configuration
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  }
+  },
+  connectionTimeout: 10000
 });
 
-// Verify Gmail Connection on Boot
 transporter.verify((error, success) => {
   if (error) {
     console.log('====================================');
@@ -54,7 +52,6 @@ transporter.verify((error, success) => {
   }
 });
 
-// Signup Route
 app.post('/api/signup', async (req, res) => {
   console.log('====================================');
   console.log('NEW SIGNUP ATTEMPT RECEIVED!');
@@ -122,7 +119,6 @@ app.post('/api/signup', async (req, res) => {
   }
 });
 
-// Verification Endpoint
 app.get('/api/verify/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -139,7 +135,6 @@ app.get('/api/verify/:id', async (req, res) => {
   }
 });
 
-// Signin Route
 app.post('/api/signin', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -165,7 +160,6 @@ app.post('/api/signin', async (req, res) => {
   }
 });
 
-// Fallback Route to serve SPA frontend
 app.get(/(.*)/, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

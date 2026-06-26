@@ -140,7 +140,7 @@
 
                 if (response.ok) {
                     signupForm.reset();
-                    signupMessage.textContent = 'Email in Inbox';
+                    signupMessage.textContent = data.message;
                     signupMessage.classList.add('success');
                 } else {
                     signupMessage.textContent = data.message;
@@ -172,7 +172,7 @@
                 if (response.ok) {
                     localStorage.setItem('token', data.token);
                     signinForm.reset();
-                    signinMessage.textContent = 'Login successful!';
+                    signinMessage.textContent = data.message;
                     signinMessage.classList.add('success');
                 } else {
                     signinMessage.textContent = data.message;

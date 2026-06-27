@@ -30,14 +30,14 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
+  service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   },
-  connectionTimeout: 5000
+  tls: {
+    rejectUnauthorized: false
+  }
 });
 
 app.post('/api/signup', async (req, res) => {
@@ -76,37 +76,29 @@ app.post('/api/signup', async (req, res) => {
     const protocol = req.protocol;
     const verificationLink = `${protocol}://${domain}/api/verify/${newUser._id}`;
 
-    console.log('====================================');
-    console.log('MANUAL VERIFICATION LINK FOR TESTING:');
-    console.log(verificationLink);
-    console.log('====================================');
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Welcome to Criticality!',
+      html: `
+        <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+          <p>hello, i glad you loggged into criticality</p>
+          <br>
+          <p>Click the link below to verify your account:</p>
+          <p>
+            <a href="${verificationLink}" target="_blank" style="padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+              Verify Email Address
+            </a>
+          </p>
+          <br>
+          <p style="font-size: 13px; color: #666;">Or copy this link into your browser:</p>
+          <p style="font-size: 13px; color: #007bff; word-break: break-all;">${verificationLink}</p>
+        </div>
+      `
+    };
 
-    try {
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: 'Welcome to Criticality!',
-        html: `
-          <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
-            <p>hello, i glad you loggged into criticality</p>
-            <br>
-            <p>Click the link below to verify your account:</p>
-            <p>
-              <a href="${verificationLink}" target="_blank" style="padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
-                Verify Email Address
-              </a>
-            </p>
-            <br>
-            <p style="font-size: 13px; color: #666;">Or copy this link into your browser:</p>
-            <p style="font-size: 13px; color: #007bff; word-break: break-all;">${verificationLink}</p>
-          </div>
-        `
-      };
-      await transporter.sendMail(mailOptions);
-      console.log(`✅ SUCCESS: Verification email fired off to ${email}!`);
-    } catch (mailError) {
-      console.log('⚠️ NOTICE: SMTP Port blocked by Render Free Tier. Use the link logged above.');
-    }
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ SUCCESS: Verification email fired off to ${email}!`);
 
     res.status(201).json({ message: 'Verification sent to inbox' });
   } catch (error) {

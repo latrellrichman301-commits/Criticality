@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,24 +29,29 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
 app.post('/api/signup', async (req, res) => {
   console.log('====================================');
   console.log('NEW SIGNUP ATTEMPT RECEIVED!');
-  console.log('Data sent from browser:', req.body);
   console.log('====================================');
 
   try {
     const { username, email, password, birthday } = req.body;
     
     if (!username || !email || !password || !birthday) {
-      console.log('🚨 REJECTED: Missing information from form.');
       return res.status(400).json({ message: 'Please fill out all fields.' });
     }
 
     const existingUser = await User.findOne({ username: username.toLowerCase() });
     if (existingUser) {
-      console.log(`🚨 REJECTED: Username '${username}' is already taken!`);
-      return res.status(4000).json({ message: 'Username already exists' });
+      return res.status(400).json({ message: 'Username already exists' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -58,53 +64,39 @@ app.post('/api/signup', async (req, res) => {
     });
 
     await newUser.save();
-    console.log(`✅ SUCCESS: User saved to database.`);
+    console.log(`✅ User saved to database.`);
 
     const domain = req.get('host');
     const protocol = req.protocol;
     const verificationLink = `${protocol}://${domain}/api/verify/${newUser._id}`;
 
-    console.log('====================================');
-    console.log('COPY AND PASTE THIS LINK TO VERIFY YOUR TEST USER:');
-    console.log(verificationLink);
-    console.log('====================================');
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Welcome to Criticality!',
+      html: `
+        <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+          <p>hello, i glad you loggged into criticality</p>
+          <br>
+          <p>Click the link below to verify your account:</p>
+          <p>
+            <a href="${verificationLink}" target="_blank" style="padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+              Verify Email Address
+            </a>
+          </p>
+          <br>
+          <p style="font-size: 13px; color: #666;">Or copy this link into your browser:</p>
+          <p style="font-size: 13px; color: #007bff; word-break: break-all;">${verificationLink}</p>
+        </div>
+      `
+    };
 
-    const searchParams = new URLSearchParams();
-    searchParams.append('apikey', process.env.ELASTIC_API_KEY || '');
-    searchParams.append('subject', 'Welcome to Criticality!');
-    searchParams.append('from', email); 
-    searchParams.append('fromName', 'Criticality App Verification');
-    searchParams.append('to', email);
-    searchParams.append('bodyHtml', `
-      <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
-        <p>hello, i glad you loggged into criticality</p>
-        <br>
-        <p>Click the link below to verify your account:</p>
-        <p>
-          <a href="${verificationLink}" target="_blank" style="padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
-            Verify Email Address
-          </a>
-        </p>
-      </div>
-    `);
-
-    try {
-      const response = await fetch('https://api.elasticemail.com/v2/email/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: searchParams.toString()
-      });
-      const responseData = await response.json();
-      console.log('API RESPONSE FROM ELASTIC:', responseData);
-    } catch (e) {
-      console.log('Elastic service transmission issue.');
-    }
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Gmail successfully delivered verification to ${email}`);
 
     res.status(201).json({ message: 'Verification sent to inbox' });
   } catch (error) {
-    console.log('❌ CRITICAL SERVER ERROR:', error.message);
+    console.log('❌ SERVER ERROR:', error.message);
     res.status(500).json({ message: `Server error during signup: ${error.message}` });
   }
 });

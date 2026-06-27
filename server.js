@@ -64,10 +64,43 @@ app.post('/api/signup', async (req, res) => {
     const protocol = req.protocol;
     const verificationLink = `${protocol}://${domain}/api/verify/${newUser._id}`;
 
-    res.status(201).json({ 
-      message: 'Account created! Click here to verify:', 
-      link: verificationLink 
+    const searchParams = new URLSearchParams();
+    searchParams.append('apikey', process.env.ELASTIC_API_KEY);
+    searchParams.append('subject', 'Welcome to Criticality!');
+    searchParams.append('from', email); 
+    searchParams.append('to', email);
+    searchParams.append('bodyHtml', `
+      <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+        <p>hello, i glad you loggged into criticality</p>
+        <br>
+        <p>Click the link below to verify your account:</p>
+        <p>
+          <a href="${verificationLink}" target="_blank" style="padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+            Verify Email Address
+          </a>
+        </p>
+        <br>
+        <p style="font-size: 13px; color: #666;">Or copy this link into your browser:</p>
+        <p style="font-size: 13px; color: #007bff; word-break: break-all;">${verificationLink}</p>
+      </div>
+    `);
+
+    const response = await fetch('https://api.elasticemail.com/v2/email/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: searchParams.toString()
     });
+
+    if (response.ok) {
+      console.log(`✅ SUCCESS: Real email fired off via Elastic Email API to ${email}`);
+    } else {
+      const errorText = await response.text();
+      console.log('❌ ELASTIC API ERROR:', errorText);
+    }
+
+    res.status(201).json({ message: 'Verification sent to inbox' });
   } catch (error) {
     console.log('❌ CRITICAL SERVER ERROR:', error.message);
     res.status(500).json({ message: `Server error during signup: ${error.message}` });

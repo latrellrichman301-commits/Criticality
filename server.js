@@ -30,7 +30,9 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 8443,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
@@ -70,7 +72,7 @@ app.post('/api/signup', async (req, res) => {
     });
 
     await newUser.save();
-    console.log(`✅ SUCCESS: User '${newUser.username}' saved to database.`);
+    console.log(`✅ SUCCESS: User saved to database.`);
 
     const domain = req.get('host');
     const protocol = req.protocol;

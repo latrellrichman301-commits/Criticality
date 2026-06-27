@@ -3,97 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criticality</title>
+    <title>Criticality Portal</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <div class="logo-container">
-        <img src="/icon.png" alt="Criticality Icon" class="logo-image">
-    </div>
-
-    <div class="main-layout">
-        <div class="card">
-            <h2>Sign Up</h2>
-            <p class="subtitle">Create a free account to start playing and building</p>
-            <form id="signup-form">
-                <div class="input-group">
-                    <label>Birthday</label>
-                    <div class="birthday-row">
-                        <select id="birth-month" required>
-                            <option value="" disabled selected>Month</option>
-                            <option value="01">January</option>
-                            <option value="02">February</option>
-                            <option value="03">March</option>
-                            <option value="04">April</option>
-                            <option value="05">May</option>
-                            <option value="06">June</option>
-                            <option value="07">July</option>
-                            <option value="08">August</option>
-                            <option value="09">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
-                        </select>
-                        <select id="birth-day" required>
-                            <option value="" disabled selected>Day</option>
-                            <script>
-                                for(let i=1; i<=31; i++) {
-                                    document.write(`<option value="${i.toString().padStart(2, '0')}">${i}</option>`);
-                                }
-                            </script>
-                        </select>
-                        <select id="birth-year" required>
-                            <option value="" disabled selected>Year</option>
-                            <script>
-                                const currentYear = new Date().getFullYear();
-                                for(let i=currentYear; i>=1900; i--) {
-                                    document.write(`<option value="${i}">${i}</option>`);
-                                }
-                            </script>
-                        </select>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label for="signup-username">Username</label>
-                    <input type="text" id="signup-username" placeholder="Don't use your real name" required autocomplete="username">
-                </div>
-                <div class="input-group">
-                    <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" placeholder="Enter your email address" required autocomplete="email">
-                </div>
-                <div class="input-group">
-                    <label for="signup-password">Password</label>
-                    <input type="password" id="signup-password" placeholder="At least 4 characters" required autocomplete="new-password">
-                </div>
-                <div class="input-group">
-                    <label for="signup-confirm">Confirm Password</label>
-                    <input type="password" id="signup-confirm" placeholder="Type password again" required autocomplete="new-password">
-                </div>
-                <button type="submit" class="btn-signup">Sign Up</button>
-            </form>
-            <div id="signup-message" class="message"></div>
+    <div id="auth-screen">
+        <div class="logo-container">
+            <h1 class="logo-text">Criticality</h1>
         </div>
 
-        <div class="card">
-            <h2>Sign In</h2>
-            <p class="subtitle">Log in with your existing account</p>
-            <form id="signin-form">
-                <div class="input-group">
-                    <label for="signin-username">Username</label>
-                    <input type="text" id="signin-username" required autocomplete="username">
-                </div>
-                <div class="input-group">
-                    <label for="signin-password">Password</label>
-                    <input type="password" id="signin-password" required autocomplete="current-password">
-                </div>
-                <button type="submit" class="btn-signin">Sign In</button>
-            </form>
-            <div id="signin-message" class="message"></div>
+        <div class="main-layout">
+            <div class="card">
+                <h2>Sign Up</h2>
+                <p class="subtitle">Create a free account to start playing and building</p>
+                <form id="signup-form">
+                    <div class="input-group">
+                        <label>Birthday</label>
+                        <div class="birthday-row">
+                            <select id="birth-month" required>
+                                <option value="" disabled selected>Month</option>
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <select id="birth-day" required>
+                                <option value="" disabled selected>Day</option>
+                                <script>
+                                    for(let i=1; i<=31; i++) {
+                                        document.write(`<option value="${i.toString().padStart(2, '0')}">${i}</option>`);
+                                    }
+                                </script>
+                            </select>
+                            <select id="birth-year" required>
+                                <option value="" disabled selected>Year</option>
+                                <script>
+                                    const currentYear = new Date().getFullYear();
+                                    for(let i=currentYear; i>=1900; i--) {
+                                        document.write(`<option value="${i}">${i}</option>`);
+                                    }
+                                </script>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-username">Username</label>
+                        <input type="text" id="signup-username" placeholder="Don't use your real name" required autocomplete="username">
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" placeholder="At least 4 characters" required autocomplete="new-password">
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-confirm">Confirm Password</label>
+                        <input type="password" id="signup-confirm" placeholder="Type password again" required autocomplete="new-password">
+                    </div>
+                    <button type="submit" class="btn-signup">Sign Up</button>
+                </form>
+                <div id="signup-message" class="message"></div>
+            </div>
+
+            <div class="card">
+                <h2>Sign In</h2>
+                <p class="subtitle">Log in with your existing account</p>
+                <form id="signin-form">
+                    <div class="input-group">
+                        <label for="signin-username">Username</label>
+                        <input type="text" id="signin-username" required autocomplete="username">
+                    </div>
+                    <div class="input-group">
+                        <label for="signin-password">Password</label>
+                        <input type="password" id="signin-password" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn-signin">Sign In</button>
+                </form>
+                <div id="signin-message" class="message"></div>
+            </div>
         </div>
     </div>
 
     <footer class="site-footer">
-        <p>&copy; 2026 Criticality. All rights reserved. | <a href="https://criticality.onrender.com" target="_blank">https://criticality.onrender.com</a></p>
+        <p>Website Name: <strong>Criticality</strong> | URL: <a href="https://criticality.onrender.com" target="_blank">https://criticality.onrender.com</a></p>
     </footer>
 
     <script>
@@ -102,10 +100,15 @@
         const signupMessage = document.getElementById('signup-message');
         const signinMessage = document.getElementById('signin-message');
 
+        if (localStorage.getItem('token')) {
+            window.location.href = '/home.html';
+        }
+
         signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             signupMessage.className = 'message';
             
+            const username = document.getElementById('signup-username').value;
             const password = document.getElementById('signup-password').value;
             const confirm = document.getElementById('signup-confirm').value;
 
@@ -123,25 +126,25 @@
 
             const birthday = `${document.getElementById('birth-year').value}-${document.getElementById('birth-month').value}-${document.getElementById('birth-day').value}`;
 
-            const payload = {
-                username: document.getElementById('signup-username').value,
-                email: document.getElementById('signup-email').value,
-                password,
-                birthday
-            };
-
             try {
                 const response = await fetch('/api/signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        username,
+                        password,
+                        birthday,
+                        email: `${username.toLowerCase()}@placeholder.com`
+                    })
                 });
                 const data = await response.json();
 
                 if (response.ok) {
                     signupForm.reset();
-                    signupMessage.textContent = data.message;
-                    signupMessage.classList.add('success');
+                    signupMessage.textContent = 'Account created successfully! Proceeding to Sign In.';
+                    signupMessage.style.display = 'block';
+                    signupMessage.style.backgroundColor = '#e6f4ea';
+                    signupMessage.style.color = '#137333';
                 } else {
                     signupMessage.textContent = data.message;
                     signupMessage.classList.add('error');
@@ -156,24 +159,22 @@
             e.preventDefault();
             signinMessage.className = 'message';
 
-            const payload = {
-                username: document.getElementById('signin-username').value,
-                password: document.getElementById('signin-password').value
-            };
+            const username = document.getElementById('signin-username').value;
+            const password = document.getElementById('signin-password').value;
 
             try {
                 const response = await fetch('/api/signin', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ username, password })
                 });
                 const data = await response.json();
 
                 if (response.ok) {
                     localStorage.setItem('token', data.token);
+                    localStorage.setItem('username', username);
                     signinForm.reset();
-                    signinMessage.textContent = data.message;
-                    signinMessage.classList.add('success');
+                    window.location.href = '/home.html';
                 } else {
                     signinMessage.textContent = data.message;
                     signinMessage.classList.add('error');

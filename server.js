@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,14 +27,6 @@ const userSchema = new mongoose.Schema({
 }, { collection: 'users' });
 
 const User = mongoose.model('User', userSchema);
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
 
 app.post('/api/signup', async (req, res) => {
   console.log('====================================');
@@ -71,39 +62,43 @@ app.post('/api/signup', async (req, res) => {
     const verificationLink = `${protocol}://${domain}/api/verify/${newUser._id}`;
 
     console.log('====================================');
-    console.log('FALLBACK VERIFICATION LINK IN LOGS:');
+    console.log('FALLBACK LINK IN LOGS:');
     console.log(verificationLink);
     console.log('====================================');
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Welcome to Criticality!',
-      html: `
-        <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
-          <p>hello, i glad you loggged into criticality</p>
-          <br>
-          <p>Click the link below to verify your account:</p>
-          <p>
-            <a href="${verificationLink}" target="_blank" style="padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
-              Verify Email Address
-            </a>
-          </p>
-          <br>
-          <p style="font-size: 13px; color: #666;">Or copy this link into your browser:</p>
-          <p style="font-size: 13px; color: #007bff; word-break: break-all;">${verificationLink}</p>
-        </div>
-      `
-    };
-
     try {
-      await transporter.sendMail(mailOptions);
-      console.log(`✅ Gmail successfully delivered verification to ${email}`);
-    } catch (mailError) {
-      console.log('⚠️ Gmail transmission blocked or delayed:', mailError.message);
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'onboarding@resend.dev',
+          to: email,
+          subject: 'Welcome to Criticality!',
+          html: `
+            <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+              <p>hello, i glad you loggged into criticality</p>
+              <br>
+              <p>Click the link below to verify your account:</p>
+              <p>
+                <a href="${verificationLink}" target="_blank" style="padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                  Verify Email Address
+                </a>
+              </p>
+            </div>
+          `
+        })
+      });
+
+      const resData = await response.json();
+      console.log('✅ Resend API Response:', resData);
+    } catch (emailErr) {
+      console.log('⚠️ Resend failed to dispatch:', emailErr.message);
     }
 
-    res.status(201).json({ message: 'Verification process initiated successfully' });
+    res.status(201).json({ message: 'Verification process initiated' });
   } catch (error) {
     console.log('❌ SERVER ERROR:', error.message);
     res.status(500).json({ message: `Server error during signup: ${error.message}` });

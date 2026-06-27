@@ -45,7 +45,7 @@ app.post('/api/signup', async (req, res) => {
     const existingUser = await User.findOne({ username: username.toLowerCase() });
     if (existingUser) {
       console.log(`🚨 REJECTED: Username '${username}' is already taken!`);
-      return res.status(400).json({ message: 'Username already exists' });
+      return res.status(4000).json({ message: 'Username already exists' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -72,8 +72,8 @@ app.post('/api/signup', async (req, res) => {
     const searchParams = new URLSearchParams();
     searchParams.append('apikey', process.env.ELASTIC_API_KEY || '');
     searchParams.append('subject', 'Welcome to Criticality!');
-    searchParams.append('from', 'onboarding@elasticemail.com'); 
-    searchParams.append('fromName', 'Criticality App');
+    searchParams.append('from', email); 
+    searchParams.append('fromName', 'Criticality App Verification');
     searchParams.append('to', email);
     searchParams.append('bodyHtml', `
       <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
@@ -97,9 +97,9 @@ app.post('/api/signup', async (req, res) => {
         body: searchParams.toString()
       });
       const responseData = await response.json();
-      console.log('API RESPONSE:', responseData);
+      console.log('API RESPONSE FROM ELASTIC:', responseData);
     } catch (e) {
-      console.log('Elastic service pending validation.');
+      console.log('Elastic service transmission issue.');
     }
 
     res.status(201).json({ message: 'Verification sent to inbox' });

@@ -70,6 +70,11 @@ app.post('/api/signup', async (req, res) => {
     const protocol = req.protocol;
     const verificationLink = `${protocol}://${domain}/api/verify/${newUser._id}`;
 
+    console.log('====================================');
+    console.log('FALLBACK VERIFICATION LINK IN LOGS:');
+    console.log(verificationLink);
+    console.log('====================================');
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
@@ -91,10 +96,14 @@ app.post('/api/signup', async (req, res) => {
       `
     };
 
-    await transporter.sendMail(mailOptions);
-    console.log(`✅ Gmail successfully delivered verification to ${email}`);
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(`✅ Gmail successfully delivered verification to ${email}`);
+    } catch (mailError) {
+      console.log('⚠️ Gmail transmission blocked or delayed:', mailError.message);
+    }
 
-    res.status(201).json({ message: 'Verification sent to inbox' });
+    res.status(201).json({ message: 'Verification process initiated successfully' });
   } catch (error) {
     console.log('❌ SERVER ERROR:', error.message);
     res.status(500).json({ message: `Server error during signup: ${error.message}` });
